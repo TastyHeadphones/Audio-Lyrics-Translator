@@ -17,28 +17,40 @@ import SwiftUI
     
     init(musicUrl: URL) {
         self.musicUrl = musicUrl
+        Task {
+            for await transcript in Recogizer.generateTranscript(musicUrl: musicUrl) {
+                await MainActor.run {
+                    self.originalLyrics = transcript
+                }
+            }
+        }
     }
 }
 
 struct LyricsView: View {
     @State private var vm: LyricsViewModel
-        
+    
     var body: some View {
-        guard let originalLyrics = vm.originalLyrics, let translatedLyrics = vm.translatedLyrics else {
-            return AnyView(Text("Loading..."))
+        HStack {
+            if let originalLyrics = vm.originalLyrics {
+                List {
+                    ForEach(originalLyrics.segments, id: \.self) { segment in
+                        Text(segment.substring)
+                    }
+                }
+            } else {
+                Text("Loading original lyrics...")
+            }
+            if let translatedLyrics = vm.translatedLyrics {
+                List {
+                    ForEach(translatedLyrics.segments, id: \.self) { segment in
+                        Text(segment.substring)
+                    }
+                }
+            } else {
+                Text("Loading translated lyrics...")
+            }
         }
-        return AnyView(HStack {
-            List {
-                ForEach(originalLyrics.segments, id: \.self) { segment in
-                    Text(segment.substring)
-                }
-            }
-            List {
-                ForEach(translatedLyrics.segments, id: \.self) { segment in
-                    Text(segment.substring)
-                }
-            }
-        })
     }
     
     init(musicUrl: URL) {

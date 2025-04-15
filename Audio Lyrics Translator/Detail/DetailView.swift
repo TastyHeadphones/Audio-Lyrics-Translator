@@ -13,6 +13,8 @@ struct DetailView: View {
     var body: some View {
         VStack {
             LyricsView(musicUrl: musicUrl)
+                .frame(maxWidth: .infinity, minHeight: 600)
+                .padding(.horizontal)
             Spacer()
             PlayerView(musicUrl: musicUrl)
         }
