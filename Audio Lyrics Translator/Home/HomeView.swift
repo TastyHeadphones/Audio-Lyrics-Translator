@@ -36,7 +36,16 @@ struct HomeView: View {
             }
         }
         .sheet(item: $selectedFileURL) { fileURL in
-            DetailView(musicUrl: fileURL)
+            ZStack(alignment: .topLeading) {
+                DetailView(musicUrl: fileURL)
+                Button(action: {
+                    self.selectedFileURL = nil
+                }) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(.white)
+                        .padding()
+                }
+            }
         }
     }
 }

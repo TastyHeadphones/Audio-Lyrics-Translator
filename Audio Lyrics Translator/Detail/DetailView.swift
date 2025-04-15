@@ -16,6 +16,5 @@ struct DetailView: View {
             Spacer()
             PlayerView(musicUrl: musicUrl)
         }
-        
     }
 }
