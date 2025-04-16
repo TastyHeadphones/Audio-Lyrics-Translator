@@ -8,5 +8,5 @@
 import Translation
 
 enum Translator {
-    static let configuration = TranslationSession.Configuration(source: .init(languageCode: .japanese), target: .init(languageCode: .chinese))
+    static var configuration = TranslationSession.Configuration(source: .init(languageCode: .japanese), target: .init(languageCode: .chinese))
 }

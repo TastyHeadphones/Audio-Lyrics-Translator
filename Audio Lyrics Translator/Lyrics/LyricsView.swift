@@ -5,6 +5,7 @@
 //  Created by Young Geo on 4/15/25.
 //
 
+import Translation
 import Speech
 import SwiftUI
 
@@ -13,7 +14,7 @@ import SwiftUI
     let musicUrl: URL
     
     var originalLyrics: SFTranscription?
-    var translatedLyrics: SFTranscription?
+    var translatedLyricsDict : [String: String] = [:]
     
     init(musicUrl: URL) {
         self.musicUrl = musicUrl
@@ -21,6 +22,7 @@ import SwiftUI
             for await transcript in Recogizer.generateTranscript(musicUrl: musicUrl) {
                 await MainActor.run {
                     self.originalLyrics = transcript
+                    Translator.configuration.invalidate()
                 }
             }
         }
@@ -29,26 +31,30 @@ import SwiftUI
 
 struct LyricsView: View {
     @State private var vm: LyricsViewModel
-    
+
     var body: some View {
-        HStack {
+        List {
             if let originalLyrics = vm.originalLyrics {
-                List {
-                    ForEach(originalLyrics.segments, id: \.self) { segment in
+                ForEach(originalLyrics.segments, id: \.self) { segment in
+                    HStack {
                         Text(segment.substring)
+                        Spacer()
+                        Text(vm.translatedLyricsDict[segment.substring] ?? "No")
+                            .foregroundColor(.red)
                     }
                 }
-            } else {
-                Text("Loading original lyrics...")
             }
-            if let translatedLyrics = vm.translatedLyrics {
-                List {
-                    ForEach(translatedLyrics.segments, id: \.self) { segment in
-                        Text(segment.substring)
-                    }
+        }
+        .translationTask(Translator.configuration) { session in
+            let sourceBatchText = vm.originalLyrics?.segments.map { $0.substring } ?? []
+            for text in sourceBatchText {
+                if vm.translatedLyricsDict[text] != nil { return }
+                do {
+                    let translatedText = try await session.translate(text).targetText
+                    vm.translatedLyricsDict[text] = translatedText
+                } catch {
+                    print("Error translate speech: \(error)")
                 }
-            } else {
-                Text("Loading translated lyrics...")
             }
         }
     }

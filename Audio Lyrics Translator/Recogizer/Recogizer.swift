@@ -21,7 +21,6 @@ enum Recogizer {
                     print("Error recognizing speech: \(error)")
                     continuation.finish()
                 } else if let result = result {
-                    print("Transcription result: \(result.bestTranscription.formattedString)")
                     continuation.yield(result.bestTranscription)
                     if result.isFinal {
                         continuation.finish()
