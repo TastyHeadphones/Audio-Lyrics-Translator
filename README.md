@@ -2,6 +2,8 @@
 
 **Audio Lyrics Translator** is a SwiftUI app that recognizes spoken lyrics from an audio file and translates them into another language — all using 100% native Apple frameworks.
 
+![Demo](demo.gif)
+
 ## ✨ Features
 
 - 🎧 **Speech Recognition**  
